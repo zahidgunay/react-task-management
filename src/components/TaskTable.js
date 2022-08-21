@@ -2,28 +2,60 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import { useEffect, useState } from 'react'
 import { Collapse } from 'react-bootstrap'
+import axios from "axios";
+
+
+
 function TaskTable(props) {
   const [selected, setSelected] = useState([])
-  const { taskShow, showDelete, setShowDelete } = props.showPrps
-  const products = [
-    { id: 0, name: "Item name 0", price: 2100 },
-    { id: 1, name: "Item name 1", price: 2101 },
-    { id: 2, name: "Item name 2", price: 2102 },
-    { id: 3, name: "Item name 3", price: 2103 }
-  ];
+  const { taskShow, setShowDelete,setShowUpdate } = props.showPrps
+  const [taskData,setTaskData] = useState({})
+  const {deleteButton,setDeleteButton} = props.stateDelete
+  const setUpdateData = props.stateUpdate
+  const deleteData=()=>{
+    selected.map(async(rows)=>{
+       await axios.delete("http://localhost:3001/tasks/"+rows)
+        .then(()=>{
+          setDeleteButton(false)
+        })
+       
+    })
+
+ }
+  useEffect(()=>{
+    const fetchData = async()=>{
+        const response = await axios.get("http://localhost:3001/tasks")
+        setTaskData(response.data)
+       
+    }
+    fetchData()
+    if(deleteButton){
+      deleteData()
+      
+    }
+   
+  },[selected,deleteButton,taskShow])
+ 
 
   const columns = [{
     dataField: 'id',
-    text: 'Product ID'
+    text: 'Task ID'
   }, {
-    dataField: 'name',
-    text: 'Product Name'
+    dataField: 'project_name',
+    text: 'Project Name'
   }, {
-    dataField: 'price',
-    text: 'Product Price'
-  }];
+    dataField: 'task_name',
+    text: 'Task Name'
+  },
+  {
+    dataField: 'status',
+    text: 'Status'
+  }
+
+];
   const handleSelectAll = (select, row) => {
     const rowId = row.map(rows => rows.id)
+    
     if (select) {
       setSelected(rowId)
       setShowDelete(false)
@@ -37,23 +69,25 @@ function TaskTable(props) {
   const handleSelect = (row, select) => {
 
     if (select) {
-
+   
       setSelected(arr => [...arr, row.id])
+      setUpdateData(row)
+      setShowUpdate(true)
       setShowDelete(false)
 
     } else {
+      setUpdateData()
       const indi = selected.indexOf(row.id)
       if (indi > -1) {
         selected.splice(indi, 1);
+        
       }
+      !selected.length ? setShowDelete(true) : setShowDelete(false)
+
     }
   }
-//Burayı düzelt
-  useEffect(() => {
-    if(selected ==[]){
-     console.log("naber")
-    }
-  });
+
+ 
   const selectRow = {
     mode: 'checkbox',
     clickToSelect: true,
@@ -64,10 +98,11 @@ function TaskTable(props) {
 
   return (
     <Collapse in={taskShow}>
+
       <div>
         <BootstrapTable
           keyField="id"
-          data={products}
+          data={taskData}
           columns={columns}
           striped
           hover
