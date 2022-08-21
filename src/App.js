@@ -1,23 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
-
+import BootstrapTable from 'react-bootstrap-table-next';
+import TaskTable from './components/TaskTable'
 function App() {
+  const selectRow = {
+    mode: 'checkbox',
+    clickToSelect: true
+  };
+  const products = [
+    { id: 0, name: "Item name 0", price: 2100 },
+    { id: 1, name: "Item name 1", price: 2101 },
+    { id: 2, name: "Item name 2", price: 2102 },
+    { id: 3, name: "Item name 3", price: 2103 }
+  ];
+  
+  const columns = [{
+    dataField: 'id',
+    text: 'Product ID'
+  }, {
+    dataField: 'name',
+    text: 'Product Name'
+  }, {
+    dataField: 'price',
+    text: 'Product Price'
+  }];
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <TaskTable/>
     </div>
   );
 }
